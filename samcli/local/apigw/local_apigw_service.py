@@ -14,7 +14,9 @@ from werkzeug.routing import BaseConverter
 from werkzeug.serving import WSGIRequestHandler
 
 from samcli.commands.local.lib.exceptions import UnsupportedInlineCodeError
+from samcli.commands.local.lib.lambda_runner import LambdaRunner
 from samcli.commands.local.lib.local_lambda import LocalLambdaRunner
+from samcli.commands.local.lib.remote_lambda import RemoteLambdaRunner
 from samcli.lib.providers.provider import Api, Cors
 from samcli.lib.telemetry.event import EventName, EventTracker, UsedFeature
 from samcli.lib.utils.stream_writer import StreamWriter
@@ -94,7 +96,7 @@ class LocalApigwService(BaseLocalService):
         """
         super().__init__(lambda_runner.is_debugging(), port=port, host=host, ssl_context=ssl_context)
         self.api = api
-        self.lambda_runner = lambda_runner
+        self.lambda_runner = LambdaRunner(lambda_runner, RemoteLambdaRunner(lambda_runner.debug_context))
         self.static_dir = static_dir
         self._dict_of_routes: Dict[str, Route] = {}
         self.stderr = stderr
